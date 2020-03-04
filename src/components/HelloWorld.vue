@@ -1,58 +1,112 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <demo-section>
+    <demo-block title="$t('basicUsage')">
+      <van-button
+        type="primary"
+        @click="showImagePreview"
+      >
+        <!-- {{ $t('button1') }} -->
+        预览图片
+      </van-button>
+    </demo-block>
+
+    <demo-block title="$t('button2')">
+      <van-button
+        type="primary"
+        @click="showImagePreview(1)"
+      >
+        <!-- {{ $t('button2') }} -->
+        指定初始位置
+      </van-button>
+    </demo-block>
+
+    <demo-block title="$t('button3')">
+      <van-button
+        type="primary"
+        @click="showImagePreview(0, 1000)"
+      >
+        <!-- {{ $t('button3') }} -->
+        异步关闭
+      </van-button>
+    </demo-block>
+
+    <demo-block title="$t('componentCall')">
+      <van-button
+        type="primary"
+        @click="componentCall"
+      >
+        <!-- {{ $t('componentCall') }} -->
+        组件调用
+      </van-button>
+      <van-image-preview
+        v-model="show"
+        :images="images"
+        :swipe-duration="300"
+        @change="onChange"
+      >
+        <template #index>{{ index}}</template>
+      </van-image-preview>
+    </demo-block>
+  </demo-section>
 </template>
 
 <script>
+import Vue from "vue";
+import ImagePreview from "vant/lib/image-preview";
+import "vant/lib/image-preview/style";
+Vue.use(ImagePreview);
+const images = [
+  'https://img.yzcdn.cn/vant/apple-1.jpg',
+  'https://img.yzcdn.cn/vant/apple-2.jpg',
+  'https://img.yzcdn.cn/vant/apple-3.jpg',
+  'https://img.yzcdn.cn/vant/apple-4.jpg'
+];
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  // i18n: {
+  //   'zh-CN': {
+  //     button1: '预览图片',
+  //     button2: '指定初始位置',
+  //     button3: '异步关闭',
+  //     componentCall: '组件调用',
+  //     index: index => `第${index + 1}页`
+  //   },
+  //   'en-US': {
+  //     button1: 'Show Images',
+  //     button2: 'Custom Start Position',
+  //     button3: 'Async Close',
+  //     componentCall: 'Component Call',
+  //     index: index => `Page: ${index}`
+  //   }
+  // },
+  data() {
+    return {
+      show: false,
+      images,
+      index: 0
+    };
+  },
+  methods: {
+    componentCall() {
+      this.show = true;
+    },
+    onChange(index) {
+      this.index = index;
+    },
+    showImagePreview(position, timer) {
+      const instance = ImagePreview({
+        images,
+        lazyLoad: true,
+        swipeDuration: 300,
+        asyncClose: !!timer,
+        closeOnPopstate: true,
+        startPosition: typeof position === 'number' ? position : 0
+      });
+      if (timer) {
+        setTimeout(() => {
+          instance.close();
+        }, timer);
+      }
+    }
   }
-}
+};
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
